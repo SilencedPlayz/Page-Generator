@@ -1,0 +1,367 @@
+<html>
+  <head>
+    <title>[Alpha Test] Online Chat</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <style>
+    :root {
+      --primary-color: #171717;
+      --secondary-color: #595959;
+      --text-color: white;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0px 20px 20px 20px;
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      font-family: "poppins";
+    }
+    @font-face {
+      font-family: "poppins";
+      src: url("./assets/fonts/Poppins-Regular.ttf") format("truetype")
+    }
+    @font-face {
+      font-family: "poppins-bold";
+      src: url("./assets/fonts/Poppins-Bold.ttf") format("truetype")
+    }
+    @font-face {
+      font-family: "poppins-light";
+      src: url("./assets/fonts/Poppins-Light.ttf") format("truetype")
+    }
+    
+    /*Main Panel*/
+    #conversation {
+      background-color: var(--primary-color);
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: 60px 1fr 60px;
+    }
+    #conversation > * {
+      outline: none;
+    }
+    
+    /*First Child*/
+    #header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bold {
+      font-family: "poppins-bold";
+    }
+    #h-title {
+      font-size: 20px;
+    }
+    #h-menubtn {
+      width: 20px;
+      height: 20px;
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-image: url("./assets/bars-sort.png");
+      filter: invert(1);
+    }
+    #h-infobtn {
+      width: 25px;
+      height: 25px;
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-image: url("./assets/book_d.png");
+      filter: invert(1);
+    }
+    #h-infobtn:hover {
+      background-image: url("./assets/book_p.png");
+      
+    }
+    
+    /*Second Child*/
+    #chats {
+      overflow-y: scroll;
+      padding-top: 30px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .chat-panel {
+      display: grid;
+      flex-direction: column;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .chatname {
+      font-family: "poppins-light";
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.5;
+    }
+    .cn-other {
+      text-align: left;
+      margin-left: 10px;
+    }
+    .cn-self {
+      margin-right: 10px;
+      text-align: right;
+    }
+    .chatbox {
+      padding: 10px;
+      max-width: 500px;
+    }
+    .other {
+      background-color: white;
+      color: black;
+      border-radius: 20px 20px 20px 0px;
+      justify-self: left;
+    }
+    .self {
+      border-radius: 20px 20px 0 20px;
+      background-color: #353535;
+      justify-self: right;
+      align-self: right;
+    }
+    .comment {
+      text-align: center;
+      opacity: 0.5;
+      font-size: 13px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+    .image {
+      width: 200px;
+      height: 200px;
+      border-radius: 12px;
+      margin: 0;
+      background-color: gray;
+    }
+    .img-panel {
+      display: grid;
+    }
+    .img-self {
+      justify-self: right;
+      border-radius: 20px 20px 0 20px;
+    }
+    .img-other {
+      justify-self: left;
+      border-radius: 20px 20px 20px 0px;
+    }
+    
+    /*Third Child*/
+    #typebox {
+      display: flex;
+      align-items: center;
+      height: 20px;
+      background-color: var(--primary-color);
+      padding: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    #typing-panel {
+      padding: 5px;
+      height: 30px;
+      border-radius: 35px;
+      background-color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+    }
+    #upload-file {
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-image: url("./assets/file-upload.png");
+      filter: invert(1);
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+    #upload-image {
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-image: url("./assets/image.png");
+      filter: invert(1);
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+    #tb-input {
+      outline: 0.5px solid red;
+      width: 100%;
+      height: 100%;
+      outline: none;
+      background: none;
+      border: none;
+      color: white;
+      text-overflow: break-word;
+      padding-left: 20px;
+      padding-right: 20px;
+      align-content: center;
+      resize: none;
+      font-family: "poppins";
+    }
+    #tb-sendbtn {
+      width: 40px;
+      height: 40px;
+      background-image: url("./assets/send.png");
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: invert(1);
+    }
+  </style>
+  <body>
+    <div id="conversation">
+      <div id="header">
+        <div id="h-menubtn"></div>
+        <div id="h-title"><span class="bold">Public</span>Chat</div>
+        <div id="h-infobtn"></div>
+      </div>
+      
+      <div id="chats">
+        <!--div class="chat-panel">
+          <p class="chatname cn-other">Rexander • 12:56 AM</p>
+          <div class="chatbox other">Hellooo sheeesh</div>
+        </div>
+        
+        <div class="chat-panel img-panel">
+          <p class="chatname cn-other">Rexander • 12:56 AM</p>
+          <img class="image img-other" src="./assets/pics/pic1.png">
+        </div>
+        
+        <div class="comment">Wala lang, sheeesh</div>
+        
+        <div class="chat-panel">
+          <p class="chatname cn-self">Test • 1:05 PM</p>
+          <div class="chatbox self">Test</div>
+        </div>
+        
+        <div class="chat-panel img-panel">
+          
+          <p class="chatname cn-self">Test • 1:05 PM</p>
+          <img class="image img-self" src="./assets/pics/pic2.png">
+        </div-->
+      </div>
+      <div id="typebox">
+        <div id="upload-file"></div>
+        <div id="upload-image"></div>
+        <div id="typing-panel">
+          <textarea placeholder="Type here..." id="tb-input"></textarea>
+          <div class="hidden">
+            <input id="inputImage" type="file" accept="image/*" multiple>
+            <input id="inputFiles" type="file" accept="/" multiple>
+          </div>
+          <div id="tb-sendbtn"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  
+  <script src="./client.js"></script>
+  <script>
+    let name = "Rex"
+    const $ = id => document.getElementById(id)
+    const $q = id => document.querySelector(id)
+    const chats = $("chats")
+    const sendBtn = $("tb-sendbtn")
+    const upFile = $("upload-file")
+    const upImg = $("upload-image")
+    const input = $("tb-input")
+    const date = new Date().getDate()
+    const month = new Date().getMonth()
+    const year = new Date().getFullYear()
+    const hour = new Date().getHours()
+    const minute = new Date().getMinutes()
+    const fulldate = `${month}/${date}/${year}`
+    const fulltime = new Date().toLocaleTimeString(`en-Us`, {
+      hour12: true,
+      timeZone: "Asia/manila",
+      hour: "numeric",
+      minute: "2-digit"
+    })
+    
+    console.log(fulldate)
+    console.log(fulltime)
+    
+    function textSelf(message){
+      const panel = document.createElement("div")
+      panel.classList.add("chat-panel")
+      const cname = document.createElement("p")
+      cname.classList.add("chatname")
+      cname.classList.add("cn-self")
+      cname.innerText = `${name} • ${fulltime}`
+      const cbox = document.createElement("div")
+      cbox.classList.add("chatbox")
+      cbox.classList.add("self")
+      cbox.innerText = message
+      panel.appendChild(cname)
+      panel.appendChild(cbox)
+      chats.appendChild(panel)
+      socket.send(message)
+    }
+    function textOther(sname, message){
+      const panel = document.createElement("div")
+      panel.classList.add("chat-panel")
+      const cname = document.createElement("p")
+      cname.classList.add("chatname")
+      cname.classList.add("cn-other")
+      cname.innerText = `${sname} • ${fulltime}`
+      const cbox = document.createElement("div")
+      cbox.classList.add("chatbox")
+      cbox.classList.add("other")
+      cbox.innerText = message
+      panel.appendChild(cname)
+      panel.appendChild(cbox)
+      chats.appendChild(panel)
+    }
+    function comment(message){
+      const newcom = document.createElement("div")
+      newcom.classList.add("comment")
+      newcom.innerText = message
+      chats.appendChild(newcom)
+    }
+    
+    sendBtn.addEventListener("click", ()=>{
+      if(input.value.trim().startsWith("§>")){
+        const mes = input.value.slice(2)
+        textOther(mes)
+        input.value = ""
+        chats.scrollTo(0, chats.scrollHeight);
+        sendBtn.style.display = "none"
+        upImg.style.display = ""
+        upFile.style.display = ""
+      }else
+      if(input.value.trim().startsWith("n>")){
+        const mes = input.value.slice(2)
+        name = mes
+        input.value = ""
+        comment("Name has been updated to "+mes)
+        chats.scrollTo(0, chats.scrollHeight);
+        sendBtn.style.display = "none"
+        upImg.style.display = ""
+        upFile.style.display = ""
+      }else
+      if(input.value.trim() !== ""){
+        textSelf(input.value)
+        input.value = ""
+        chats.scrollTo(0, chats.scrollHeight);
+        sendBtn.style.display = "none"
+        upImg.style.display = ""
+        upFile.style.display = ""
+      }
+    })
+    
+    input.addEventListener("input", ()=>{
+      if(input.value.trim() === ""){
+        sendBtn.style.display = "none"
+        upImg.style.display = ""
+        upFile.style.display = ""
+      }else{
+        sendBtn.style.display = ""
+        upImg.style.display = "none"
+        upFile.style.display = "none"
+      }
+    })
+  </script>
+</html>
