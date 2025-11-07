@@ -1,6 +1,6 @@
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
+    <!meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
     <title>[Alpha Test] Online Chat</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
@@ -161,8 +161,8 @@
     }
     #typing-panel {
       padding: 5px;
-      height: 30px;
       width: 100%;
+      height: 30px;
       border-radius: 35px;
       background-color: var(--secondary-color);
       display: flex;
@@ -262,7 +262,7 @@
   
   <script src="./client.js"></script>
   <script>
-    let name = "Rex"
+    let NAME = "Rex"
     const $ = id => document.getElementById(id)
     const $q = id => document.querySelector(id)
     const chats = $("chats")
@@ -292,7 +292,7 @@
       const cname = document.createElement("p")
       cname.classList.add("chatname")
       cname.classList.add("cn-self")
-      cname.innerText = `${name} • ${fulltime}`
+      cname.innerText = `${NAME} • ${fulltime}`
       const cbox = document.createElement("div")
       cbox.classList.add("chatbox")
       cbox.classList.add("self")
@@ -301,6 +301,11 @@
       panel.appendChild(cbox)
       chats.appendChild(panel)
       socket.send(message)
+      input.value = ""
+      chats.scrollTo(0, chats.scrollHeight);
+      sendBtn.style.display = "none"
+      upImg.style.display = ""
+      upFile.style.display = ""
     }
     function textOther(sname, message){
       const panel = document.createElement("div")
@@ -316,6 +321,11 @@
       panel.appendChild(cname)
       panel.appendChild(cbox)
       chats.appendChild(panel)
+      input.value = ""
+      chats.scrollTo(0, chats.scrollHeight);
+      sendBtn.style.display = "none"
+      upImg.style.display = ""
+      upFile.style.display = ""
     }
     function comment(message){
       const newcom = document.createElement("div")
@@ -328,11 +338,6 @@
       if(input.value.trim().startsWith("§>")){
         const mes = input.value.slice(2)
         textOther(mes)
-        input.value = ""
-        chats.scrollTo(0, chats.scrollHeight);
-        sendBtn.style.display = "none"
-        upImg.style.display = ""
-        upFile.style.display = ""
       }else
       if(input.value.trim().startsWith("n>")){
         const mes = input.value.slice(2)
@@ -345,12 +350,10 @@
         upFile.style.display = ""
       }else
       if(input.value.trim() !== ""){
-        textSelf(input.value)
-        input.value = ""
-        chats.scrollTo(0, chats.scrollHeight);
-        sendBtn.style.display = "none"
-        upImg.style.display = ""
-        upFile.style.display = ""
+        socket.send(JSON.stringify({
+          name: NAME,
+          message: input.value
+        }))
       }
     })
     
