@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title></title>
+    <style>
+      
+    </style>
+  </head>
+  
+  <body>
+    <input id="input">
+    <button id="send" onclick="send()">Send</button>
+  </body>
+  
+  <script>
+    function log(message){
+      const newelem = document.createElement("div")
+      newelem.innerText = message
+      document.body.appendChild(newelem)
+    }
+    
+    function send(){
+      if(input.value.trim() !== ""){
+        socket.send(input.value)
+      }
+    }
+    
+    const socket = new WebSocket('https://4c247a47-dfba-48e5-9288-a0b46abc340d-00-3v6p32ewl2slk.sisko.replit.dev:3000/');
+
+    socket.onopen = () => {
+      log("Connected Successfully")
+    };
+    
+    socket.onmessage = (event) => {
+      log(event.data)
+    };
+    
+    socket.onclose = () => {
+      log("Disconnected")
+    };
+  </script>
+</html>
