@@ -8,9 +8,10 @@ socket.onmessage = (event) => {
   const data = JSON.parse(event.data)
   const name = data.name
   const message = data.message
-  const type = data.type
   
-  if(type === "text"){
+  if(NAME === name){
+    textSelf(message)
+  }else{
     textOther(name, message)
   }
 };
