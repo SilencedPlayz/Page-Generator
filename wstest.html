@@ -22,6 +22,7 @@
       if(input.value.trim() !== ""){
         socket.send(input.value)
         log(input.value)
+        input.value = ""
       }
     }
     
