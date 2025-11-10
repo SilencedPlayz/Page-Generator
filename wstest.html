@@ -1,10 +1,10 @@
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
+    <!meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
     <title>Web Chat by Rex</title>
     <style>
       body {
-        background-color: #2f2f2f;
+        background-color: #0B0E13;
         color: white;
         margin: 0;
         padding: 20px 30px 30px 30px;
@@ -44,18 +44,18 @@
         justify-self: center;
         width: 80%;
         max-width: 800px;
-        height: 120px;
-        background-color: #1e1e1e;
-        border-radius: 15px;
+        
+        background-color: #1A2333;
+        border-radius: 20px;
         overflow: hidden;
         flex-direction: column;
         padding: 10px;
-        outline: 1px solid #252525;
+        outline: 1px solid #292929;
         z-index: 10;
       }
       #input {
         width: 100%;
-        height: 100%;
+        height: 70%;
         resize: none;
         background: none;
         outline: none;
@@ -65,35 +65,61 @@
         padding: 10px;
         font-family: "poppins";
       }
-      .btn {
-        height: 100%;
-        color: white;
-        font-size: 13px;
-        font-family: "poppins";
-        text-align: center;
-        align-items: center;
-        display: flex;
-      }
-      #send {
-        font-family: "poppins-b";
-        background: none;
-        border: none;
-        color: #00b1f9;
+      #input:focus {
+        height: 100px;
       }
       #btn-group {
         height: 50px;
         width: 100%;
         display: flex;
         align-items: center;
-        justify-content: space-evenly;
+        justify-content: center;
+      }
+      .btn {
+        height: 100%;
+        width: 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        font-size: 13px;
+        font-family: "poppins";
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        font-family: "poppins";
+        border-radius: 20px;
+        color: white;
+        background-color: #1f74ff;
+        transition: background-color 0.3s ease-out;
+      }
+      #mic {
+        background-color: #00000000;
+        border-radius: 50px;
+        outline: 0.1px solid #bbbbbb;
+        background-image: url("./assets/mic_on.png");
+        background-size: 23px;
+        filter: invert(1);
+        width: 60px;
+        margin-right: 10px;
+      }
+      #mic:active {
+        background-color: #EFE9DE;
+      }
+      #send:active {
+        background-color: #3b86ff;
+      }
+      #send {
+        opacity: 0.5;
+        pointer-events: none;
       }
       .divider-type {
         background-color: #2d2d2d;
         width: 100%;
         height: 1px;
         border-radius: 15px;
-        margin-bottom: 5px;
-        margin-top: 5px;
+        margin-bottom: 10px;
+        margin-top: 10px;
       }
       .divider-btns {
         background-color: #2d2d2d;
@@ -164,7 +190,7 @@
         top: 0;
         left: 0;
         z-index: 20;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
       }
@@ -175,6 +201,7 @@
         width: 100%;
       }
       #overlay-text {
+        display: none;
         opacity: 1;
         position: absolute;
         z-index: 30;
@@ -191,11 +218,36 @@
           opacity: 1;
         }
       }
+      
+      .log-group {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        justify-content: center;
+      }
+      .divider-log {
+        background-color: #2d2d2d;
+        width: 100%;
+        height: 1px;
+      }
+      .log-text {
+        margin: 10px;
+        font-size: 10px;
+        text-align: center;
+        white-space: nowrap;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     </style>
   </head>
   
   <body>
+    
     <div id="overlay">
+      <div id="edit-usernameform">
+        
+      </div>
       <p id="overlay-text">Connecting to Server...</p>
       <div id="overlay-bg"></div>
     </div>
@@ -205,10 +257,7 @@
         <textarea id="input" placeholder="Message..."></textarea>
         <div class="divider-type"></div>
         <div id="btn-group">
-          <div id="selectall" class="btn">CTRL-A</div>
-          <div class="divider-btns"></div>
-          <div id="paste" class="btn">Paste</div>
-          <div class="divider-btns"></div>
+          <div id="mic" class="btn"></div>
           <div id="send" class="btn" onclick="send()">Send</div>
         </div>
       </div>
@@ -229,6 +278,20 @@
     const replit = "https://4c247a47-dfba-48e5-9288-a0b46abc340d-00-3v6p32ewl2slk.sisko.replit.dev:3000/"
     const local = "ws://localhost:8080"
     const overlayText = document.getElementById("overlay-text")
+    const input = document.getElementById("input")
+    const sendBtn = document.getElementById("send")
+    const mic = document.getElementById("mic")
+    const conversation = document.getElementById("conversation")
+    
+    input.addEventListener("input", ()=>{
+      if(input.value.trim() === ""){
+        sendBtn.style.pointerEvents = "none"
+        sendBtn.style.opacity = "0.5"
+      }else{
+        sendBtn.style.pointerEvents = "auto"
+        sendBtn.style.opacity = "1"
+      }
+    })
     
     function log(type, message){
       if(!message || !type){
@@ -263,6 +326,21 @@
           msgpan.appendChild(usrn)
           msgpan.appendChild(msg)
           conversation.appendChild(msgpan)
+        }else
+        if(type === "log"){
+          const newlog = document.createElement("div")
+          newlog.classList.add("log-group")
+          const newdivider = document.createElement("div")
+          const newdivider2 = document.createElement("div")
+          newdivider.classList.add("divider-log")
+          newdivider2.classList.add("divider-log")
+          const newtext = document.createElement("div")
+          newtext.classList.add("log-text")
+          newtext.innerText = message
+          conversation.appendChild(newlog)
+          newlog.appendChild(newdivider)
+          newlog.appendChild(newtext)
+          newlog.appendChild(newdivider2)
         }else{
           console.error("Invalid Type")
         }
@@ -270,9 +348,11 @@
     }
     function send(){
       if(input.value.trim() !== ""){
-        socket.send(JSON.stringify({username: USERNAME, msg: input.value}))
+        socket.send(JSON.stringify({type: "chat", username: USERNAME, msg: input.value}))
         log("self", {username: USERNAME, msg: input.value})
         input.value = ""
+        sendBtn.style.pointerEvents = "none"
+        sendBtn.style.opacity = "0.5"
         conversation.scrollTo({
           top: conversation.scrollHeight,
           behavior: "smooth"
@@ -283,15 +363,28 @@
     const socket = new WebSocket(replit);
     socket.onopen = () => {
       overlay.style.display = "none"
+      const sendlog = {type: "log", username: USERNAME, msg: `${USERNAME} joined`}
+      socket.send(JSON.stringify(sendlog))
     };
+    
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      log("other", {username: data.username, msg: data.msg})
+      const dt = data.type
+      const du = data.username
+      const dm = data.msg
+      console.log(dm)
+      if(dt === "log"){
+        log("log", dm)
+      }else
+      if(dt === "chat"){
+        log("other", {username: du, msg: dm})
+      }
       conversation.scrollTo({
         top: conversation.scrollHeight,
         behavior: "smooth"
       })
     };
+    
     socket.onclose = () => {
       overlayText.innerText = "Failed to Connect"
       overlayText.style.color = "red"
