@@ -9,6 +9,8 @@
         margin: 0;
         padding: 20px 30px 30px 30px;
         font-family: "poppins";
+        display: grid;
+        grid-template-rows: 30px 1fr 200px;
       }
       @font-face {
         font-family: "poppins";
@@ -29,12 +31,6 @@
       .error {
         color: red;
       }
-      #tb-overlay {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-      }
       #typeboard {
         bottom: 0;
         margin: 20px;
@@ -42,7 +38,7 @@
         align-items: center;
         justify-content: center;
         justify-self: center;
-        width: 80%;
+        width: 90%;
         max-width: 800px;
         background-color: #1A2333;
         border-radius: 20px;
@@ -129,7 +125,6 @@
         margin-top: 5px;
       }
       #conversation {
-        height: 70%;
         overflow-y: scroll;
       }
       h3 {
@@ -155,12 +150,12 @@
       
       #header {
         display: flex;
-        font-size: 15px;
+        font-size: 20px;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        display: flex;
+        align-items: center;
       }
       .h-panel {
         display: flex;
@@ -191,7 +186,7 @@
         top: 0;
         left: 0;
         z-index: 20;
-        display: none;
+        display: flex;
         align-items: center;
         justify-content: center;
       }
@@ -240,6 +235,95 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      
+      #edit-usernameform {
+        width: 270px;
+        background-color: #1A2333;
+        position: absolute;
+        z-index: 30;
+        border-radius: 40px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #eu-field {
+        background-color: #0B0E13;
+        width: 100%;
+        height: 90px;
+        border-radius: 35px;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        margin-top: 15px;
+        margin-bottom: 15px;
+      }
+      #euf-icon {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        width: 20px;
+        height: 30px;
+        filter: invert(1);
+        background-image: url("./assets/user.png");
+        border-radius: 100px 100px 190px 190px;
+        margin-left: 10px;
+      }
+      #euf-group {
+        height: 40px;
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      #euf-label {
+        font-size: 13px;
+        opacity: 0.5;
+      }
+      #euf-input {
+        background: none;
+        outline: none;
+        border: none;
+        color: white;
+        padding: 0;
+        font-size: 17px;
+        font-family: "poppins";
+        width: 90%;
+      }
+      #euf-input:focus {
+        border-bottom: 0.5px solid #959595;
+      }
+      #eu-btnpanel {
+        width: 100%;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #eu-btn {
+        background-color: #1f74ff;
+        width: 60%;
+        height: 100%;
+        border-radius: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #eu-btn:active {
+        background-color: #3b86ff;
+      }
+      #errortxt {
+        font-size: 10px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color: red;
+        display: none;
+      }
+      #author {
+        font-size: 13px;
+        margin-left: 10px;
+      }
     </style>
   </head>
   
@@ -247,14 +331,29 @@
     
     <div id="overlay">
       <div id="edit-usernameform">
-        
+        <div>What should we call you?</div>
+        <div id="eu-field">
+          <div id="euf-icon"></div>
+          <div id="euf-group">
+            <div id="euf-label">Username</div>
+            <input id="euf-input" maxlength="20" placeholder="Guest" value="Guest">
+          </div>
+        </div>
+        <div id="errortxt">Unable to connect to server, try again.</div>
+        <div id="eu-btnpanel">
+          <div id="eu-btn">Log-In</div>
+        </div>
       </div>
-      <p id="overlay-text">Connecting to Server...</p>
       <div id="overlay-bg"></div>
     </div>
     
-    <div id="tb-overlay">
-      <div id="typeboard">
+    <div id="header">
+      <p>
+        <b>Public</b> chat<span id="author">by Rex/Silenced</span>
+      </p>
+    </div>
+    <div id="conversation"></div>
+    <div id="typeboard">
         <textarea id="input" placeholder="Message..."></textarea>
         <div class="divider-type"></div>
         <div id="btn-group">
@@ -262,16 +361,6 @@
           <div id="send" class="btn" onclick="send()">Send</div>
         </div>
       </div>
-    </div>
-    
-    <div id="header">
-      <div class="h-panel">
-        <b class="hp-label">username:</b>
-        <input id="username" placeholder="guest.user" value="rexander.reyes">
-      </div>
-    </div>
-    <div id="conversation">
-    </div>
   </body>
   
   <script>
@@ -287,16 +376,19 @@
       "James", 
       "Amelia"
     ];
-    let USERNAME = names[Math.floor(Math.random()*names.length)]
+    let socket;
     const replit = "https://4c247a47-dfba-48e5-9288-a0b46abc340d-00-3v6p32ewl2slk.sisko.replit.dev:3000/"
     const local = "ws://localhost:8080"
-    const overlayText = document.getElementById("overlay-text")
+    const loginBtn = document.getElementById("eu-btn")
+    const usrField = document.getElementById("eu-field")
     const input = document.getElementById("input")
     const sendBtn = document.getElementById("send")
-    const username = document.getElementById("username")
+    const username = document.getElementById("euf-input")
     const mic = document.getElementById("mic")
+    const errorTxt = document.getElementById("errortxt")
     const conversation = document.getElementById("conversation")
-    username.value = USERNAME
+    
+    username.value = names[Math.floor(Math.random()*names.length)]
     input.addEventListener("input", ()=>{
       if(input.value.trim() === ""){
         sendBtn.style.pointerEvents = "none"
@@ -306,13 +398,7 @@
         sendBtn.style.opacity = "1"
       }
     })
-    username.addEventListener("input", ()=>{
-      if(username.value.trim() !== ""){
-        USERNAME = username.value
-      }else{
-        USERNAME = "guest.user"
-      }
-    })
+    
     function log(type, message){
       if(!message || !type){
         console.error("Argument is missing: message,type")
@@ -366,14 +452,74 @@
         }
       }
     }
-    function send(){
-      if(input.value.trim() !== ""){
+    async function send(){
+      if(input.value.trim() === "") return;
+      if(input.value.trim().startsWith("?>")){
+        const logms = input.value.slice(2)
+        socket.send(JSON.stringify({type: "log", username: "Rex", msg: logms}))
+        log("log", logms)
+        input.value = "?>"
+      }else{
         socket.send(JSON.stringify({type: "chat", username: USERNAME, msg: input.value}))
         log("self", {username: USERNAME, msg: input.value})
         input.value = ""
         sendBtn.style.pointerEvents = "none"
         sendBtn.style.opacity = "0.5"
         conversation.scrollTo({
+          top: conversation.scrollHeight,
+          behavior: "smooth"
+        })
+      }
+    }
+    
+    loginBtn.addEventListener("click", ()=>{
+      USERNAME = username.value
+      errorTxt.style.display = "none"
+      loginBtn.innerText = "Connecting..."
+      loginBtn.style.opacity = "0.5"
+      loginBtn.style.pointerEvents = "none"
+      usrField.style.opacity = "0.5"
+      usrField.style.pointerEvents = "none"
+      wsStart()
+    })
+    
+    function wsStart(){
+      socket = new WebSocket(replit);
+      socket.onopen = () => {
+        overlay.style.display = "none"
+        const sendlog = {type: "log", username: USERNAME, msg: `${USERNAME} joined`}
+        socket.send(JSON.stringify(sendlog))
+      };
+      
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+        const dt = data.type
+        const du = data.username
+        const dm = data.msg
+        console.log(dm)
+        if(dt === "log"){
+          log("log", dm)
+        }else
+        if(dt === "chat"){
+          log("other", {username: du, msg: dm})
+        }
+        conversation.scrollTo({
+          top: conversation.scrollHeight,
+          behavior: "smooth"
+        })
+      };
+      
+      socket.onclose = () => {
+        errorTxt.style.display = "block"
+        loginBtn.innerText = "Log-in"
+        loginBtn.style.opacity = "1"
+        loginBtn.style.pointerEvents = "auto"
+        usrField.style.opacity = "1"
+        usrField.style.pointerEvents = "auto"
+      };
+    }
+  </script>
+</html>o({
           top: conversation.scrollHeight,
           behavior: "smooth"
         })
