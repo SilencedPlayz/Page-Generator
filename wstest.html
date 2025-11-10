@@ -1,43 +1,301 @@
 <html>
   <head>
-    <title></title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
+    <title>Web Chat by Rex</title>
     <style>
+      body {
+        background-color: #2f2f2f;
+        color: white;
+        margin: 0;
+        padding: 20px 30px 30px 30px;
+        font-family: "poppins";
+      }
+      @font-face {
+        font-family: "poppins";
+        src: url("./assets/Poppins-Regular.ttf") format("truetype")
+      }
+      @font-face {
+        font-family: "poppins-b";
+        src: url("./assets/Poppins-Bold.ttf") format("truetype")
+      }
+      @font-face {
+        font-family: "poppins-l";
+        src: url("./assets/Poppins-Light.ttf") format("truetype")
+      }
+      .log {}
+      .success {
+        color: lime;
+      }
+      .error {
+        color: red;
+      }
+      #tb-overlay {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      #typeboard {
+        bottom: 0;
+        margin: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        justify-self: center;
+        width: 80%;
+        max-width: 800px;
+        height: 120px;
+        background-color: #1e1e1e;
+        border-radius: 15px;
+        overflow: hidden;
+        flex-direction: column;
+        padding: 10px;
+        outline: 1px solid #252525;
+        z-index: 10;
+      }
+      #input {
+        width: 100%;
+        height: 100%;
+        resize: none;
+        background: none;
+        outline: none;
+        border: none;
+        color: white;
+        font-size: 13px;
+        padding: 10px;
+        font-family: "poppins";
+      }
+      .btn {
+        height: 100%;
+        color: white;
+        font-size: 13px;
+        font-family: "poppins";
+        text-align: center;
+        align-items: center;
+        display: flex;
+      }
+      #send {
+        font-family: "poppins-b";
+        background: none;
+        border: none;
+        color: #00b1f9;
+      }
+      #btn-group {
+        height: 50px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+      }
+      .divider-type {
+        background-color: #2d2d2d;
+        width: 100%;
+        height: 1px;
+        border-radius: 15px;
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
+      .divider-btns {
+        background-color: #2d2d2d;
+        height: 50%;
+        width: 1px;
+        border-radius: 15px;
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
+      #conversation {
+        height: 70%;
+        overflow-y: scroll;
+      }
+      h3 {
+        text-align: center;
+      }
+      .message-panel {
+        margin-top: 30px;
+      }
+      .self-msg {
+        justify-self: right;
+        text-align: right;
+      }
+      .username {
+        font-family: "poppins-l";
+        font-size: 13px;
+        opacity: 0.5;
+      }
+      .message {
+        max-height: 100px;
+        overflow-y: scroll;
+        text-overflow: ellipsis;
+      }
       
+      #header {
+        display: flex;
+        font-size: 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .h-panel {
+        display: flex;
+      }
+      .hp-label {
+        margin-right: 5px;
+        font-family: "poppins-b";
+      }
+      #username {
+        border: none;
+        outline: none;
+        background: none;
+        width: 50%;
+        color: white;
+        font-family: poppins;
+        padding: 0;
+        opacity: 0.5;
+        font-size: 15px;
+      }
+      #username:focus {
+        border-bottom: 1px solid white;
+      }
+      
+      #overlay {
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #overlay-bg {
+        background-color: black;
+        opacity: 0.7;
+        height: 100%;
+        width: 100%;
+      }
+      #overlay-text {
+        opacity: 1;
+        position: absolute;
+        z-index: 30;
+        animation: fade 3s infinite linear;
+      }
+      @keyframes fade {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   
   <body>
-    <input id="input">
-    <button id="send" onclick="send()">Send</button>
+    <div id="overlay">
+      <p id="overlay-text">Connecting to Server...</p>
+      <div id="overlay-bg"></div>
+    </div>
+    
+    <div id="tb-overlay">
+      <div id="typeboard">
+        <textarea id="input" placeholder="Message..."></textarea>
+        <div class="divider-type"></div>
+        <div id="btn-group">
+          <div id="selectall" class="btn">CTRL-A</div>
+          <div class="divider-btns"></div>
+          <div id="paste" class="btn">Paste</div>
+          <div class="divider-btns"></div>
+          <div id="send" class="btn" onclick="send()">Send</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="header">
+      <div class="h-panel">
+        <b class="hp-label">username:</b>
+        <input id="username" placeholder="guest.user" value="rexander.reyes">
+      </div>
+    </div>
+    <div id="conversation">
+    </div>
   </body>
   
   <script>
-    function log(message){
-      const newelem = document.createElement("div")
-      newelem.innerText = message
-      document.body.appendChild(newelem)
-    }
+    let USERNAME = "rexander.reyes"
+    const replit = "https://4c247a47-dfba-48e5-9288-a0b46abc340d-00-3v6p32ewl2slk.sisko.replit.dev:3000/"
+    const local = "ws://localhost:8080"
+    const overlayText = document.getElementById("overlay-text")
     
+    function log(type, message){
+      if(!message || !type){
+        console.error("Argument is missing: message,type")
+      } else {
+        if(type === "self"){
+          const msgpan = document.createElement("div")
+          const usrn = document.createElement("div")
+          const msg = document.createElement("div")
+          const msgUsername = message.username
+          const msgMes = message.msg
+          msgpan.classList.add("message-panel", "self-msg")
+          usrn.classList.add("username")
+          msg.classList.add("message")
+          usrn.innerText = msgUsername
+          msg.innerText = msgMes
+          msgpan.appendChild(usrn)
+          msgpan.appendChild(msg)
+          conversation.appendChild(msgpan)
+        }else
+        if(type === "other"){
+          const msgpan = document.createElement("div")
+          const usrn = document.createElement("div")
+          const msg = document.createElement("div")
+          const msgUsername = message.username
+          const msgMes = message.msg
+          msgpan.classList.add("message-panel")
+          usrn.classList.add("username")
+          msg.classList.add("message")
+          usrn.innerText = msgUsername
+          msg.innerText = msgMes
+          msgpan.appendChild(usrn)
+          msgpan.appendChild(msg)
+          conversation.appendChild(msgpan)
+        }else{
+          console.error("Invalid Type")
+        }
+      }
+    }
     function send(){
       if(input.value.trim() !== ""){
-        socket.send(input.value)
-        log(input.value)
+        socket.send(JSON.stringify({username: USERNAME, msg: input.value}))
+        log("self", {username: USERNAME, msg: input.value})
         input.value = ""
+        conversation.scrollTo({
+          top: conversation.scrollHeight,
+          behavior: "smooth"
+        })
       }
     }
     
-    const socket = new WebSocket('https://4c247a47-dfba-48e5-9288-a0b46abc340d-00-3v6p32ewl2slk.sisko.replit.dev:3000/');
-
+    const socket = new WebSocket(replit);
     socket.onopen = () => {
-      log("Connected Successfully")
+      overlay.style.display = "none"
     };
-    
     socket.onmessage = (event) => {
-      log(event.data)
+      const data = JSON.parse(event.data)
+      log("other", {username: data.username, msg: data.msg})
+      conversation.scrollTo({
+        top: conversation.scrollHeight,
+        behavior: "smooth"
+      })
     };
-    
     socket.onclose = () => {
-      log("Disconnected")
+      overlayText.innerText = "Failed to Connect"
+      overlayText.style.color = "red"
+      overlayText.style.animation = "none"
     };
   </script>
 </html>
