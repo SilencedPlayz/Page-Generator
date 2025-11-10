@@ -1,6 +1,6 @@
 <html>
   <head>
-    <!meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.8">
     <title>Web Chat by Rex</title>
     <style>
       body {
@@ -274,15 +274,28 @@
   </body>
   
   <script>
-    let USERNAME = "rexander.reyes"
+    const names = [
+      "Liam", 
+      "Sophia", 
+      "Ethan", 
+      "Ava", 
+      "Noah", 
+      "Mia", 
+      "Lucas", 
+      "Isabella", 
+      "James", 
+      "Amelia"
+    ];
+    let USERNAME = names[Math.floor(Math.random()*names.length)]
     const replit = "https://4c247a47-dfba-48e5-9288-a0b46abc340d-00-3v6p32ewl2slk.sisko.replit.dev:3000/"
     const local = "ws://localhost:8080"
     const overlayText = document.getElementById("overlay-text")
     const input = document.getElementById("input")
     const sendBtn = document.getElementById("send")
+    const username = document.getElementById("username")
     const mic = document.getElementById("mic")
     const conversation = document.getElementById("conversation")
-    
+    username.value = USERNAME
     input.addEventListener("input", ()=>{
       if(input.value.trim() === ""){
         sendBtn.style.pointerEvents = "none"
@@ -292,7 +305,13 @@
         sendBtn.style.opacity = "1"
       }
     })
-    
+    username.addEventListener("input", ()=>{
+      if(username.value.trim() !== ""){
+        USERNAME = username.value
+      }else{
+        USERNAME = "guest.user"
+      }
+    })
     function log(type, message){
       if(!message || !type){
         console.error("Argument is missing: message,type")
