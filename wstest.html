@@ -519,42 +519,4 @@
       };
     }
   </script>
-</html>o({
-          top: conversation.scrollHeight,
-          behavior: "smooth"
-        })
-      }
-    }
-    
-    const socket = new WebSocket(replit);
-    socket.onopen = () => {
-      overlay.style.display = "none"
-      const sendlog = {type: "log", username: USERNAME, msg: `${USERNAME} joined`}
-      socket.send(JSON.stringify(sendlog))
-    };
-    
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      const dt = data.type
-      const du = data.username
-      const dm = data.msg
-      console.log(dm)
-      if(dt === "log"){
-        log("log", dm)
-      }else
-      if(dt === "chat"){
-        log("other", {username: du, msg: dm})
-      }
-      conversation.scrollTo({
-        top: conversation.scrollHeight,
-        behavior: "smooth"
-      })
-    };
-    
-    socket.onclose = () => {
-      overlayText.innerText = "Failed to Connect"
-      overlayText.style.color = "red"
-      overlayText.style.animation = "none"
-    };
-  </script>
 </html>
